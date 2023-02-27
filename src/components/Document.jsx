@@ -41,10 +41,10 @@ export const Document = (props) => {
   const EditHandler = (e) => {
     // validation
     if (titleRef.current.value === "") {
-      alert("Please write title");
+      msg("Please write title");
       titleRef.current.focus();
     } else if (ContentRef.current.value === "") {
-      alert("Please write some content");
+     msg("Please write some content");
       ContentRef.current.focus();
     } else {
       // editing document
@@ -55,7 +55,6 @@ export const Document = (props) => {
           setTitle(titleRef.current.value);
           documentArr.setDocumentArr(documentArr.documentArr);
           setmsg("Edited sucessfully");
-          alert("edited");
         }
         documentArr.setDocumentArr(documentArr.documentArr);
       }

@@ -26,7 +26,7 @@ export const Modal = () => {
     // validation
     let data = [];
     if (title === "") {
-      alert("Plese write title ");
+      msg("Plese write title ");
     } else if (content === "") {
       setMsg("Please write content");
     } else {
