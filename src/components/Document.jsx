@@ -3,48 +3,75 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { documentContext } from "../App";
 
 export const Document = (props) => {
+  // ref for titile box
   const titleRef = useRef(null);
+  // ref for content box
   const ContentRef = useRef(null);
-  const [data, setData] = useState([]);
+  // state for massage
+  const [msg, setmsg] = useState("");
+  // state for title box
+  const [title, setTitle] = useState("");
+  const [document1, setDocuments1] = useState([]);
+  // fetching documemt array from context
   const documentArr = useContext(documentContext);
-
+  useEffect(() => {
+    // fetching array from local storage
+    if (JSON.parse(localStorage.getItem("Documents") !== null)) {
+      setDocuments1(JSON.parse(localStorage.getItem("Documents")));
+    }
+    document1.forEach((element) => {
+      if (element.id === props.id) {
+        setTitle(element.title);
+      }
+    });
+  }, [documentArr, document1.length]);
   useEffect(() => {
     titleRef.current.value = props.title;
     ContentRef.current.value = props.content;
   }, []);
+  // title handler
   const titleHandler = (e) => {
     titleRef.current.value = e.target.value;
   };
+  // content handler
   const contentHandler = (e) => {
     ContentRef.current.value = e.target.value;
   };
+  // Edit button functinality
   const EditHandler = (e) => {
-    let document = JSON.parse(localStorage.getItem("Documents"));
-    console.log(document);
-    for (let i = 0; i < documentArr.documentArr.length; i++) {
-      if (JSON.parse(e.target.value) === documentArr.documentArr[i].id) {
-        var obj = {
-          content: ContentRef.current.value,
-          title: titleRef.current.value,
-          id: documentArr.documentArr[i].id,
-        };
-        documentArr.documentArr[i] = obj;
-        console.log(documentArr.documentArr[i]);
-        // data.push(obj);
-        setData([...documentArr.documentArr, document[i]]);
-        console.log(data);
+    // validation
+    if (titleRef.current.value === "") {
+      alert("Please write title");
+      titleRef.current.focus();
+    } else if (ContentRef.current.value === "") {
+      alert("Please write some content");
+      ContentRef.current.focus();
+    } else {
+      // editing document
+      for (let i = 0; i < documentArr.documentArr.length; i++) {
+        if (JSON.parse(e.target.value) === documentArr.documentArr[i].id) {
+          documentArr.documentArr[i].content = ContentRef.current.value;
+          documentArr.documentArr[i].title = titleRef.current.value;
+          setTitle(titleRef.current.value);
+          documentArr.setDocumentArr(documentArr.documentArr);
+          setmsg("Edited sucessfully");
+          alert("edited");
+        }
+        documentArr.setDocumentArr(documentArr.documentArr);
       }
     }
-    localStorage.setItem("Documents", JSON.stringify(data));
+    // after editing again storimg data in local storage
+    localStorage.setItem("Documents", JSON.stringify(documentArr.documentArr));
+    setDocuments1(JSON.parse(localStorage.getItem("Documents")));
   };
   return (
     <div>
       <button
-        className="btn btn-info"
+        className="btn btn-info w-50"
         data-bs-toggle="modal"
         data-bs-target={`#exampleModal${props.id}`}
       >
-        {props.title}
+        {title}
       </button>
       <div
         className="modal fade"
@@ -89,6 +116,20 @@ export const Document = (props) => {
                   fullWidth
                 />
               </div>
+              {msg === "" ? (
+                ""
+              ) : (
+                <div class="alert alert-info" role="alert">
+                  {msg}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                    style={{ float: "right" }}
+                  ></button>
+                </div>
+              )}
             </div>
             <div className="modal-footer">
               <button

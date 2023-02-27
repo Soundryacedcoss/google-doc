@@ -5,27 +5,28 @@ import "./Landing.css";
 export const Landing = () => {
   const [document, setDocuments] = useState([]);
   const documentArr = useContext(documentContext);
-  const [title, setTitle] = useState("");
-  console.log(documentArr);
+  const [emptyMsg, setEmptyMsg] = useState("");
   useEffect(() => {
     if (JSON.parse(localStorage.getItem("Documents") !== null)) {
       setDocuments(JSON.parse(localStorage.getItem("Documents")));
     }
+  }, [documentArr]);
+  useEffect(() => {
+    // empty msg
+    setEmptyMsg("There is no document available please create");
   }, []);
-  const ClickHandler = (e) => {
-    documentArr.documentArr.forEach((element) => {
-      console.log(typeof JSON.stringify(e), typeof JSON.stringify(element.id));
-     
-
-      if (JSON.stringify(element.id) === JSON.stringify(e)) {
-        console.log("dhd");
-        setTitle(element.title);
+  // delete functionality
+  const DeleteHandler = (e) => {
+    for (let i = 0; i < document.length; i++) {
+      if (document[i].id === e) {
+        documentArr.documentArr.splice(i, 1);
       }
-    });
+    }
+    documentArr.setDocumentArr([...documentArr.documentArr]);
+    localStorage.setItem("Documents", JSON.stringify(documentArr.documentArr));
   };
-  console.log("tiitle", title);
   return (
-    <div>
+    <div className="App">
       <h2>Docs Clone</h2>
       <button
         className="btn btn-warning"
@@ -35,13 +36,20 @@ export const Landing = () => {
         Add a document
       </button>
       <hr />
-      {JSON.parse(localStorage.getItem("Documents"))!==null 
-      ?  documentArr.documentArr.map((val) => (
-            <div className="document_card mt-3">
-              <Document content={val.content} title={val.title} id={val.id} />
-            </div>
-          ))
-      :""}
+      {document.length === 0 ? <p className="Empty">{emptyMsg}</p> : ""}
+      <div className="Document_container">
+        {document.map((val) => (
+          <div className="document_card mt-3 p-3 w-25">
+            <Document content={val.content} title={val.title} id={val.id} />
+            <i
+              class="fas fa-trash-alt"
+              style={{ fontSize: "30px", color: "red", marginTop: "4%" }}
+              value={val.id}
+              onClick={() => DeleteHandler(val.id)}
+            ></i>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

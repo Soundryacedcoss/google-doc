@@ -1,28 +1,50 @@
 import { TextField } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { documentContext } from "../App";
 
 export const Modal = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [data, setData] = useState([]);
+  const [msg, setMsg] = useState("");
   const documentArr = useContext(documentContext);
+  useEffect(() => {
+    // taking data from local storage
+    if (JSON.parse(localStorage.getItem("Documents") !== null)) {
+      documentArr.setDocumentArr(JSON.parse(localStorage.getItem("Documents")));
+    }
+  }, [documentArr]);
+  // title handler
   const titleHandler = (e) => {
     setTitle(e.target.value);
   };
+  // content handler
   const contentHandler = (e) => {
     setContent(e.target.value);
   };
+  // Save document button functinality
   const saveHandler = () => {
-    var obj = {
-      title: title,
-      content: content,
-      id: Math.floor(Math.random()*1000),
-    };
-    data.push(obj);
-    setData([...data]);
-    localStorage.setItem("Documents", JSON.stringify(data));
-    documentArr.setDocumentArr(data);
+    // validation
+    let data = [];
+    if (title === "") {
+      alert("Plese write title ");
+    } else if (content === "") {
+      setMsg("Please write content");
+    } else {
+      var obj = {
+        title: title,
+        content: content,
+        id: Math.floor(Math.random() * 1000),
+      };
+      if (JSON.parse(localStorage.getItem("Documents") !== null)) {
+        data = JSON.parse(localStorage.getItem("Documents"));
+      }
+      data.push(obj);
+      setMsg("Document created !");
+      setTitle("");
+      setContent("");
+      localStorage.setItem("Documents", JSON.stringify(data));
+      documentArr.setDocumentArr(data);
+    }
   };
   return (
     <div>
@@ -50,9 +72,10 @@ export const Modal = () => {
             </div>
             <div className="modal-body">
               <TextField
-                id="outlined-multiline-flexible"
+                id="outlined-multiline-flexible title"
                 label="Title"
                 multiline
+                value={title}
                 maxRows={4}
                 onChange={titleHandler}
                 fullWidth
@@ -61,12 +84,27 @@ export const Modal = () => {
                 <TextField
                   id="outlined-multiline-static"
                   label="Content"
+                  value={content}
                   multiline
                   rows={4}
                   onChange={contentHandler}
                   fullWidth
                 />
               </div>
+              {msg === "" ? (
+                ""
+              ) : (
+                <div class="alert alert-info" role="alert">
+                  {msg}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                    style={{ float: "right" }}
+                  ></button>
+                </div>
+              )}
             </div>
             <div className="modal-footer">
               <button
